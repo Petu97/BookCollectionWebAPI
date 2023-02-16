@@ -11,10 +11,12 @@ namespace WebApplication1.Controllers
     [Route("BookCollection")]
     public class BookCollectionController : Controller
     {
+
+
         [HttpGet("books")]
-        public IActionResult GetBooks()
+        public IActionResult GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year)
         {
-            return Ok("test");
+            return Ok("author:" + author + " publisher:" + publisher + " year:" + year);
         }
 
         [HttpPost("books")]
