@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace WebApplication1.Models
@@ -6,6 +7,8 @@ namespace WebApplication1.Models
     public class Book
     {
         [JsonPropertyName("id")]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [JsonPropertyName("title")]
