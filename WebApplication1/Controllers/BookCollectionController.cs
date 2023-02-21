@@ -14,35 +14,46 @@ namespace WebApplication1.Controllers
     [Route("BookCollection")]
     public class BookCollectionController : Controller
     {
-        private readonly BookCollectionDbContext context;
+        private readonly BookCollectionDbDataAccess bookCollectionDbDataAccess;
 
-        public BookCollectionController(BookCollectionDbContext _context)
+        public BookCollectionController(BookCollectionDbDataAccess _bookCollectionDbDataAccess)
         {
-            context = _context;
+            bookCollectionDbDataAccess = _bookCollectionDbDataAccess;
         }
+
 
         [HttpGet("books")]
         public IActionResult GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year)
         {
-            return Ok("author:" + author + " publisher:" + publisher + " year:" + year);
+            if (author is null && publisher is null && year is null)
+                return Ok(bookCollectionDbDataAccess.FindAllItems().ToString());
+
+            else return Ok(bookCollectionDbDataAccess.FindObject(author, publisher, year));
         }
 
         [HttpPost("books")]
         public async Task<IActionResult> CreateBook(JsonObject newBook)
         {
             Book book = JsonSerializer.Deserialize<Book>(newBook.ToString()); //Deserializes given JSONdataobject into a book model
-            if (TryValidateModel(book))
+            Console.WriteLine("Book title: " + book.Title);
+            if (TryValidateModel(book)) //checks if new book is valid
             {
-                return Ok(book); //Validates new book, if successfull returns ok
+                Console.WriteLine("validation successfull");
+                var result = await bookCollectionDbDataAccess.AddItem(book);
+                if(result is not null)  return Ok(result); //Validates new book if successfull returns ok
+
+                else return BadRequest(); //creating a book failed
             }
-           
-            else return BadRequest();
+            else return BadRequest(); //the new book is not valid
         }
 
         [HttpDelete("books")]
-        public IActionResult DeleteBook(int id)
+        public async Task<IActionResult> DeleteBook(int id)
         {
-            return Ok();
+            var result = await bookCollectionDbDataAccess.DeleteItem(id);
+            if (result) return NoContent(); //Item deleted successfully
+
+            else return BadRequest(); //item did not exist or db was unable to finish task
         }
     }
 }
