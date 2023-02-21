@@ -21,7 +21,7 @@ namespace WebApplication1.Data
             return result;
         }
 
-        public async Task<Book> FindItemById(int id) //find and return all books in database
+        public async Task<Book> FindItemById(int id) //find and return a book with given id from database
         {
             Book? result = await DbContext.books.Where(b => b.Id == id).FirstAsync();
             return result;
