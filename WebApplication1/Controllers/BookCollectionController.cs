@@ -22,13 +22,22 @@ namespace WebApplication1.Controllers
         }
 
 
+
+        [HttpGet("books/{id:int}")]
+        public async Task<IActionResult> GetBookById(int id)
+        {
+            Book? result = await bookCollectionDbDataAccess.FindItemById(id);
+            if (result is not null) return Ok(result);
+            else return BadRequest();
+        }
+
         [HttpGet("books")]
         public IActionResult GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year)
         {
             if (author is null && publisher is null && year is null)
                 return Ok(bookCollectionDbDataAccess.FindAllItems().ToString());
 
-            else return Ok(bookCollectionDbDataAccess.FindObject(author, publisher, year));
+            else return Ok();
         }
 
         [HttpPost("books")]
