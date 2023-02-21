@@ -12,22 +12,22 @@ namespace WebApplication1.Models
         public int Id { get; set; }
 
         [JsonPropertyName("title")]
-        [Required]
+        [Required(AllowEmptyStrings =false)]
         public string Title { get; set; }
 
         [JsonPropertyName("author")]
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public string Author { get; set; }
 
         [JsonPropertyName("year")]
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public int Year { get; set; }
 
         [JsonPropertyName("publisher")]
-        public string Publisher { get; set; }
+        public string? Publisher { get; set; }
 
         [JsonPropertyName("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
     }
 }
