@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using WebApplication1.Data;
 using WebApplication1.Models;
 
@@ -11,7 +8,7 @@ namespace WebApplication1.Controllers
 {
 
     [ApiController]
-    [Route("BookCollection")]
+    [Route("books")]
     public class BookCollectionController : Controller
     {
         private readonly BookCollectionDbDataAccess bookCollectionDbDataAccess;
@@ -21,7 +18,7 @@ namespace WebApplication1.Controllers
             bookCollectionDbDataAccess = _bookCollectionDbDataAccess;
         }
 
-        [HttpGet("books/{id:int}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetBookById(int id) //find item from db with given id
         {
             Book? result = await bookCollectionDbDataAccess.FindItemById(id);
@@ -32,7 +29,7 @@ namespace WebApplication1.Controllers
                     BadRequest();
         }
 
-        [HttpGet("books")]
+        [HttpGet]
         public async Task<IActionResult> GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year) //find and return books with given params
         {
             if (!this.HttpContext.Request.QueryString.HasValue) //no querystring given, find and return all books
@@ -60,7 +57,7 @@ namespace WebApplication1.Controllers
             }
         }
 
-        [HttpPost("books")] 
+        [HttpPost] 
         public async Task<IActionResult> CreateBook(JsonObject newBook) //method for handling post requests
         {
             Book book = JsonSerializer.Deserialize<Book>(newBook.ToString()); //Deserializes given JSONdataobject into a book model
@@ -78,7 +75,7 @@ namespace WebApplication1.Controllers
                     BadRequest(); //the new book is not valid
         }
 
-        [HttpDelete("books/{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteBook(int id) //method for handling delete requests
         {
             var result = await bookCollectionDbDataAccess.DeleteItem(id);

@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
-using System.Linq;
-
 
 namespace WebApplication1.Data
 {
