@@ -21,43 +21,65 @@ namespace WebApplication1.Controllers
             bookCollectionDbDataAccess = _bookCollectionDbDataAccess;
         }
 
-
-
         [HttpGet("books/{id:int}")]
-        public async Task<IActionResult> GetBookById(int id)
+        public async Task<IActionResult> GetBookById(int id) //find item from db with given id
         {
             Book? result = await bookCollectionDbDataAccess.FindItemById(id);
-            if (result is not null) return Ok(result);
-            else return BadRequest();
+            if (result is not null) 
+                return Ok(result);
+
+            else return 
+                    BadRequest();
         }
 
         [HttpGet("books")]
-        public IActionResult GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year)
+        public async Task<IActionResult> GetBooks([FromQuery] string ?author, [FromQuery] string ?publisher, [FromQuery] int ?year) //find and return books with given params
         {
-            if (author is null && publisher is null && year is null)
-                return Ok(bookCollectionDbDataAccess.FindAllItems().ToString());
+            if (!this.HttpContext.Request.QueryString.HasValue) //no querystring given, find and return all books
+            {
+                var allBooks = await bookCollectionDbDataAccess.FindAllItems();
+                if (allBooks is not null)
+                    return Ok(allBooks); //return list of all the books
 
-            else return Ok();
+                else
+                    return BadRequest(); //failed to fetchbooks
+            }
+
+            if (author is null && publisher is null && year is null) //no valid params given, return bad request
+                return BadRequest();
+
+            else //find books with params
+            {
+                var booksWithParams = await bookCollectionDbDataAccess.FindItems(author, publisher, year); //fetch list of books with given params
+
+                if (booksWithParams is null) //failed to find books with given params
+                    return BadRequest();
+
+                else
+                    return Ok(booksWithParams); //return list of found items
+            }
         }
 
-        [HttpPost("books")]
-        public async Task<IActionResult> CreateBook(JsonObject newBook)
+        [HttpPost("books")] 
+        public async Task<IActionResult> CreateBook(JsonObject newBook) //method for handling post requests
         {
             Book book = JsonSerializer.Deserialize<Book>(newBook.ToString()); //Deserializes given JSONdataobject into a book model
-            Console.WriteLine("Book title: " + book.Title);
+
             if (TryValidateModel(book)) //checks if new book is valid
             {
-                Console.WriteLine("validation successfull");
-                var result = await bookCollectionDbDataAccess.AddItem(book);
-                if(result is not null)  return Ok(result); //Validates new book if successfull returns ok
+                var result = await bookCollectionDbDataAccess.AddItem(book); //adds a book to db, returns id of the created item
+                if(result is not null)  
+                    return Ok(result); //Validates new book if successfull returns ok
 
-                else return BadRequest(); //creating a book failed
+                else
+                    return BadRequest(); //creating a book failed
             }
-            else return BadRequest(); //the new book is not valid
+            else return 
+                    BadRequest(); //the new book is not valid
         }
 
-        [HttpDelete("books")]
-        public async Task<IActionResult> DeleteBook(int id)
+        [HttpDelete("books/{id:int}")]
+        public async Task<IActionResult> DeleteBook(int id) //method for handling delete requests
         {
             var result = await bookCollectionDbDataAccess.DeleteItem(id);
             if (result) return NoContent(); //Item deleted successfully

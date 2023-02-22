@@ -20,7 +20,7 @@ namespace WebApplication1.Models
         public string Author { get; set; }
 
         [JsonPropertyName("year")]
-        [Required(AllowEmptyStrings = false)]
+        [Required]
         public int Year { get; set; }
 
         [JsonPropertyName("publisher")]
