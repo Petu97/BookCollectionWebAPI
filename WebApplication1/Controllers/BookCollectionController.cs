@@ -60,19 +60,28 @@ namespace WebApplication1.Controllers
         [HttpPost] 
         public async Task<IActionResult> CreateBook(JsonObject newBook) //method for handling post requests
         {
-            Book book = JsonSerializer.Deserialize<Book>(newBook.ToString()); //Deserializes given JSONdataobject into a book model
+            Book book;
+
+            try //try to deserialize given json object into book object, if fails returns bad request
+            {
+                book = JsonSerializer.Deserialize<Book>(newBook.ToString()); //Deserializes given JSONdataobject into a book model
+            }
+            catch
+            {
+                return BadRequest();
+            }
 
             if (TryValidateModel(book)) //checks if new book is valid
             {
                 var result = await bookCollectionDbDataAccess.AddItem(book); //adds a book to db, returns id of the created item
-                if(result is not null)  
+                if (result is not null)
                     return Ok(result); //Validates new book if successfull returns ok
 
                 else
                     return BadRequest(); //creating a book failed
             }
-            else return 
-                    BadRequest(); //the new book is not valid
+            else return
+                BadRequest(); //the new book is not valid
         }
 
         [HttpDelete("{id:int}")]
