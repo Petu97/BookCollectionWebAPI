@@ -25,8 +25,8 @@ namespace WebApplication1.Controllers
             if (result is not null) 
                 return Ok(result);
 
-            else return 
-                    BadRequest();
+            else return
+                    BadRequest("");
         }
 
         [HttpGet]
@@ -39,18 +39,18 @@ namespace WebApplication1.Controllers
                     return Ok(allBooks); //return list of all the books
 
                 else
-                    return BadRequest(); //failed to fetchbooks
+                    return BadRequest(""); //failed to fetchbooks
             }
 
             if (author is null && publisher is null && year is null) //no valid params given, return bad request
-                return BadRequest();
+                return BadRequest("");
 
             else //find books with params
             {
                 var booksWithParams = await bookCollectionDbDataAccess.FindItems(author, publisher, year); //fetch list of books with given params
 
                 if (booksWithParams is null) //failed to find books with given params
-                    return BadRequest();
+                    return BadRequest("");
 
                 else
                     return Ok(booksWithParams); //return list of found items
@@ -68,7 +68,7 @@ namespace WebApplication1.Controllers
             }
             catch
             {
-                return BadRequest();
+                return BadRequest("");
             }
 
             if (TryValidateModel(book)) //checks if new book is valid
@@ -78,10 +78,10 @@ namespace WebApplication1.Controllers
                     return Ok(result); //Validates new book if successfull returns ok
 
                 else
-                    return BadRequest(); //creating a book failed
+                    return BadRequest(""); //creating a book failed
             }
             else return
-                BadRequest(); //the new book is not valid
+                BadRequest(""); //the new book is not valid
         }
 
         [HttpDelete("{id:int}")]
@@ -90,7 +90,7 @@ namespace WebApplication1.Controllers
             var result = await bookCollectionDbDataAccess.DeleteItem(id);
             if (result) return NoContent(); //Item deleted successfully
 
-            else return BadRequest(); //item did not exist or db was unable to finish task
+            else return BadRequest(""); //item did not exist or db was unable to finish task
         }
     }
 }
