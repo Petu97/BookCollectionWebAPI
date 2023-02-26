@@ -20,8 +20,15 @@ namespace WebApplication1.Data
 
         public async Task<Book?> FindItemById(int id) //find and return a book with given id from database
         {
-            Book? result = await DbContext.books.Where(b => b.Id == id).FirstAsync();
-            return result;
+            try //attempts to find object, if fails returns null
+            {
+                Book? result = await DbContext.books.Where(b => b.Id == id).FirstAsync();
+                return result;
+            }
+            catch
+            {
+                return null; //refactoring idea: retrun empty instead of null, using null as retunr type is probably not the best idea
+            }
         }
 
         //makeshift function for finding and returning items with parameters. used until i find a way to create dynamic custom sql requests.
