@@ -47,9 +47,9 @@ namespace WebApplication1.Controllers
 
             else //find books with params
             {
-                var booksWithParams = await bookCollectionDbDataAccess.FindItems(author, publisher, year); //fetch list of books with given params
+                var booksWithParams = await bookCollectionDbDataAccess.RefactoredFindItems(author, publisher, year); //fetch list of books with given params
 
-                if (booksWithParams is null) //failed to find books with given params
+                if (booksWithParams is null || booksWithParams.Count() == 0) //failed to find books with given params
                     return BadRequest("");
 
                 else
