@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using WebApplication1.Models;
 
 namespace WebApplication1.Data
@@ -143,11 +144,41 @@ namespace WebApplication1.Data
                 return false;
             }
         }
+        //hate this method because it makes a query request for each parameter and then compares items (heavy on sql request side which slows the application down). Definately a lot to improve here.
+        public async Task<IEnumerable<Book>> RefactoredFindItems(string? author, string? publisher, int? year) //Add improved FindItems method here
+        {
+            List<Book> authorList = new List<Book>();
+            List<Book> publisherList = new List<Book>();
+            List<Book> yearList = new List<Book>();
 
-        private async Task<List<Book?>> RefactoredFindItems(string? author, string? publisher, int? year) //Add improved FindItems method here
-        { 
-            return null;
+            if (author is not null) //checks if author value is given, if it is then searches for books from same author. If no author param given skips this step (authorlist stays empty)
+            { 
+                authorList = await DbContext.books.Where(b => b.Author == author).ToListAsync();
+                if (authorList.Count() is 0) //failed to find books by author, return empty list
+                    return authorList;
+            }
+
+            if (publisher is not null) 
+            {
+                publisherList = await DbContext.books.Where(b => b.Publisher == publisher).ToListAsync();
+                if (publisherList.Count() is 0)
+                    return publisherList;
+            }
+
+            if (year is not null)
+            {
+                yearList = await DbContext.books.Where(b => b.Year == year).ToListAsync();
+                if (yearList.Count() is 0)
+                    return yearList;
+            }
+
+            var resultList = Intersect(authorList, publisherList, yearList); //finds identical books from lists
+            return resultList;
         }
 
+        private static IEnumerable<T> Intersect<T>(params IEnumerable<T>[] lists) //method comparing lists: ignores empty lists and finds same books in lists which it then returns 
+        {
+            return lists.Where(l => l.Any()).Aggregate((l1, l2) => l1.Intersect(l2));
+        }
     }
 }
